@@ -77,7 +77,7 @@ def summary_games(status):
 
     # 結果表示用
     #print("CSV出力が完了しました。内容は次の通りです:")
-    #print(csv_data)
+    print(csv_data)
     return csv_data
 
 def simulate_remain_games(remain_games, current_status, csv_data):
@@ -94,13 +94,18 @@ def simulate_remain_games(remain_games, current_status, csv_data):
         next_current_status = copy.deepcopy(current_status)
         next_current_status[current_game["home"]][C_WIN_CULUMN] = next_current_status[current_game["home"]][C_WIN_CULUMN] + 1
         next_current_status[current_game["visitor"]][C_LOSE_CULUMN] = next_current_status[current_game["visitor"]][C_LOSE_CULUMN] + 1
-        simulate_remain_games(master_remaining_games, master_current_status, csv_data)
+        simulate_remain_games(next_remain_games, next_current_status, csv_data)
 
         # このゲームのビジターチームが勝った場合の世界線
         next_current_status = copy.deepcopy(current_status)
         next_current_status[current_game["home"]][C_LOSE_CULUMN] = next_current_status[current_game["home"]][C_LOSE_CULUMN] + 1
         next_current_status[current_game["visitor"]][C_WIN_CULUMN] = next_current_status[current_game["visitor"]][C_WIN_CULUMN] + 1
-        simulate_remain_games(master_remaining_games, master_current_status, csv_data)
+        simulate_remain_games(next_remain_games, next_current_status, csv_data)
+
+        # 引き分けの場合の世界線
+        next_current_status = copy.deepcopy(current_status)
+        simulate_remain_games(next_remain_games, next_current_status, csv_data)
+
 
 # スレッドプールで再帰処理を並列実行する関数
 def thread_pool_recursive_function(master_remaining_games, master_current_status, csv_data):
@@ -120,8 +125,8 @@ if __name__ == '__main__':
     csv_data = []
     # スレッドプールで再帰処理を実行
     # results = thread_pool_recursive_function(master_remaining_games, master_current_status, csv_data)
-    simulate_remain_games
+    simulate_remain_games(master_remaining_games, master_current_status, csv_data)
     with open('team_rankings.csv', 'w', newline='') as file:
-        writer = csv.writer(file)(master_remaining_games, master_current_status, csv_data)
+        writer = csv.writer(file)
         writer.writerows(csv_data)  # 複数行を書き込む
 
