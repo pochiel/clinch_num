@@ -60,8 +60,6 @@ master_remaining_games = [
 def calculate_win_rate(wins, losses):
     return wins / (wins + losses)
 
-cnt = 0
-
 def summary_games(status):
     # チーム成績リストを作成
     team_stats = []
@@ -82,19 +80,11 @@ def summary_games(status):
     #print(csv_data)
     return csv_data
 
-# ロックを使って出力をスレッドセーフにする
-th_lock = threading.Lock()
-
 def simulate_remain_games(remain_games, current_status, csv_data):
     C_WIN_CULUMN = 0
     C_LOSE_CULUMN = 1
     if not remain_games:
-        with th_lock:
-            csv_data = csv_data.append(summary_games(current_status))
-            global cnt
-            cnt = cnt + 1
-            if (cnt%100000)==0:
-                print(cnt)
+        csv_data = csv_data.append(summary_games(current_status))
         return
     else:
         # リストのコピーを作成してpop
